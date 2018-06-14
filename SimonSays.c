@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdbool.h>
-//#include "linkedList.c"
+#include <unistd.h>
 
 #define BCM2708_PERI_BASE        0x20000000
 #define GPIO_BASE                (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
@@ -54,55 +54,70 @@ void printButton(int g) {
     printf("Button released!\n");
 }
 
-/*
-LED getRandomLed(void) {
-  return (rand() % 3) + 22;
-}
-*/
-
 #define getRandomPin (rand() % 3)
 #define initRand srand(time(NULL))
 
-inline void setPin(int pin) {
+void setPin(int pin) {
   GPIO_SET = 1 << (pin + 22);
 }
 
-inline void clearPin(int pin) {
+void clearPin(int pin) {
   GPIO_CLR = 1 << (pin + 22);
 }
 
-inline void flashPin(int pin) {
+void flashPin(int pin) {
+  printf("flashing %d\n", pin);
   setPin(pin);
   sleep(1);
   clearPin(pin);
 }
 
-inline void initPins(void) {
-  for (int i = 0; i < 4; i++) {
+void flashAll(void);
+
+void initPins(void) {
+  for (int i = 0; i < 3; i++) {
     INP_GPIO(i + 22);
     OUT_GPIO(i + 22);
     flashPin(i);
   }
+  flashAll();
 }
 
-inline void flashArray(int *array, int size) {
+void flashArray(int *array, int size) {
   for (int i = 0; i < size; i++) {
     flashPin(array[i]);
+    sleep(1);
   }
+}
+
+void flashAll(void) {
+  printf("flash all\n");
+  setPin(0);
+  setPin(1);
+  setPin(2);
+  sleep(1);
+  clearPin(0);
+  clearPin(1);
+  clearPin(2);
 }
 
 int main(int argc, char **argv)
 {
   int score = 0;
-  int *array;
+  int *array = NULL;
+  if (array = NULL) return -1;
+  setup_io();
   initRand;
   initPins();
+  sleep(1);
   do {
     array = realloc(array, (score + 1) * sizeof(int));
     array[score] = getRandomPin;
     flashArray(array, score + 1);
+    flashAll();
     sleep(1);
-  } while (true);
-
+    score++;
+  } while (score < 10);
+  free(array);
   return 0;
 }
